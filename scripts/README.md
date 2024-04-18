@@ -2,9 +2,9 @@
 
 This folder contain the scripts that were used to process the reads, call SNPs, and perform analyses on the data.
 
-The scripts in each folder are run sequentially. 
+Folders are named sequentially with a two digit prefix and the scripts in each folder are executed in order. For example, codes in the `01_*` folder are executed before codes in the `02_*` folder. Within each folder, the codes are executed sequentially. Some folders contain more scripts than others and contain their own README.md file.
 
-This folder is organised as follows:
+## Structure
 
 ```
 ├── 01_read_processing
@@ -21,23 +21,23 @@ This folder is organised as follows:
 |
 ├── 04_samplot
 │   ├── 00_10X_to_ref
-│   │   ├── 01a_map_10X_to_ref.sl
-│   │   └── 01b_markduplicates.sl
-│   ├── 00_markdup_rename_refindiv_10X.sl
-│   ├── 01_rename_Superscafoldchr8.sl
-│   ├── 02a_samplot_iter1.sl
-│   ├── 02b_samplot_example_plot.sl
 │   └── README.md
 |
 ├── 05_baypass_SV
-│   ├── 01_xxx.sl
-│   └── 02_xxx.sl
+│   └── README.md
 |
 ├── 06_genomic_features
-│   ├── 01_VEP_extract_missense_chr8.sl
-│   ├── 02_extract_SV_chr8.sl
 │   └── README.md
 |
 ├── 01_xxx.sl
 └── README.md
 ```
+## General overview
+
+* `01_read_processing` - Processes the WGS reads, align them to the reference genome, mark duplicate reads, and call SNPs. 
+* `02_baypass_WGS` - Converts SNP data into BayPass format, and performs BayPass core model with the `--contrastfile` argument
+* `03_EHHS` - Performs IHS, and EHHS.
+* `04_samplot` - Create samplot to identify and investigate SV region in all samples, including reference individual.
+* `05_baypass_SV` - Converts manually genotyped SV to BayPass format and performs BayPass on it.
+* `06_genomic_features` - Perform VEP, extract SV, TE, RepeatMasker, and sequences of interest for BLASTing on NCBI.
+
