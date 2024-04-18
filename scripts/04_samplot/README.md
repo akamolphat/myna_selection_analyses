@@ -1,5 +1,18 @@
 # 04_samplot
 
+The scripts in this folder are arranged as follows:
+
+```
+├── 00_10X_to_ref
+│   ├── 01a_map_10X_to_ref.sl
+│   └── 01b_markduplicates.sl
+├── 00_markdup_rename_refindiv_10X.sl
+├── 01_rename_Superscafoldchr8.sl
+├── 02a_samplot_iter1.sl
+├── 02b_samplot_example_plot.sl
+└── README.md
+```
+
 The scripts in this folder were executed in the following order:
 
 * Scripts within the `00_10X_to_ref/` folder - the scripts in this folder aligns the Chromium 10X reads to the reference genome and mark the duplicates.
