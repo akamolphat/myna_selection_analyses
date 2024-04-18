@@ -23,8 +23,11 @@ infile=13099.10X.sorted.bam
 outfiledup=${infile//.sorted.bam/.sorted.dup.bam}
 outfilereheader=${outfiledup//.sorted.dup.bam/.sorted.dup.reheader.bam}
 
-picard MarkDuplicates INPUT=${folder}/${infile} OUTPUT=${folder}/${outfiledup} METRICS_FILE=${folder}/13099.10X.metrics.txt MAX_FILE_HANDLES_FOR_READ_ENDS_MAP=1000;
-samtools index -@ 2 ${folder}/${outfiledup}
+# I don't think this section is necessary as this has already been performed
+#
+# picard MarkDuplicates INPUT=${folder}/${infile} OUTPUT=${folder}/${outfiledup} METRICS_FILE=${folder}/13099.10X.metrics.txt MAX_FILE_HANDLES_FOR_READ_ENDS_MAP=1000;
+# samtools index -@ 2 ${folder}/${outfiledup}
+#
 
 samtools view -H ${outfiledup} | sed -e 's/SN:Superscaffold_chr8/SN:chr8/' | samtools reheader - ${infile} > ${outfilereheader}
 samtools index ${outfilereheader}
