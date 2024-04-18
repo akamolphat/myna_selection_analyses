@@ -21,13 +21,8 @@ for macval in mac3 mac10
 do
 
     metafile=${DIR}metadata/myna_WGS_meta_pop_env.csv
-    popindfile=${DIR}processed/BCFtools/vcftools_filtered/plink_QUAL30_DP5-35.nosingledoubletons.filtind.5n.contigfilt1.${macval}/pop_ind.QUAL30_DP5-35.nosingledoubletons.filtind.5n.contigfilt1.${macval}.txt
-    popenvfile=${DIR}metadata/myna_WGS_env_per_pop.csv  # This is kept the same as different mac filter files have the same individuals anyways
-    pairspanelpng=${DIR}processed/baypass/${macval}/e_file_pairs_panel.png
-    efilepath=${DIR}processed/baypass/${macval}/e_file.txt
-    cfilepath=${DIR}processed/baypass/${macval}/contrastfile.txt
     efolderpath=${DIR}processed/baypass/${macval}/
 
-    Rscript --vanilla 05a_create_contrastfile.R ${metafile} ${popindfile} ${popenvfile} ${pairspanelpng} ${efilepath} ${cfilepath} ${efolderpath}
+    Rscript --vanilla 05a_create_contrastfile.R ${metafile} ${cfilepath}
 
 done
