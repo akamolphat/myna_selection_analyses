@@ -33,9 +33,10 @@ This folder is organised as follows:
 │   ├── 01_xxx.sl
 │   └── 02_xxx.sl
 |
-├── 06_VEP_TE_SV_RepeatMasker
-│   ├── 01_xxx.sl
-│   └── 02_xxx.sl
+├── 06_genomic_features
+│   ├── 01_VEP_extract_missense_chr8.sl
+│   ├── 02_extract_SV_chr8.sl
+│   └── README.md
 |
 ├── 01_xxx.sl
 └── README.md
