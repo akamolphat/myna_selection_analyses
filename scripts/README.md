@@ -20,7 +20,7 @@ This folder is organised as follows:
 │   └── 02_xxx.sl
 |
 ├── 04_samplot
-│   ├── 10X_to_ref
+│   ├── 00_10X_to_ref
 │   │   ├── 01a_map_10X_to_ref.sl
 │   │   └── 01b_markduplicates.sl
 │   ├── 00_markdup_rename_refindiv_10X.sl
