@@ -33,6 +33,10 @@ This folder is organised as follows:
 │   ├── 01_xxx.sl
 │   └── 02_xxx.sl
 |
+├── 06_VEP_TE_SV_RepeatMasker
+│   ├── 01_xxx.sl
+│   └── 02_xxx.sl
+|
 ├── 01_xxx.sl
 └── README.md
 ```
