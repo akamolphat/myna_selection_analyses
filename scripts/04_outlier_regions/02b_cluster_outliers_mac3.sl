@@ -1,7 +1,7 @@
 #!/bin/bash -e
-#SBATCH --job-name=09bii
-#SBATCH --output=09_errors/09bii_%j.out
-#SBATCH --error=09_errors/09bii_%j.err
+#SBATCH --job-name=02b
+#SBATCH --output=02_errors/02b_%j.out
+#SBATCH --error=02_errors/02b_%j.err
 #SBATCH --mail-user=kats326@aucklanduni.ac.nz
 #SBATCH --mail-type=ALL
 #SBATCH --time=1:00:00
@@ -17,7 +17,7 @@ ml BEDTools/2.30.0-GCC-11.3.0
 
 echo "Get XtX outlier regions"
 
-path2script=/nesi/nobackup/uoa02613/A_selection_analyses/selection_analyses/WGS/scripts/09b_define_outlier_regions.R
+path2script=/nesi/nobackup/uoa02613/A_selection_analyses/selection_analyses/WGS/scripts/02_cluster_outliers.R
 macval=mac3
 wdir=/nesi/nobackup/uoa02613/A_selection_analyses/selection_analyses/WGS/data/processed/baypass/${macval}/combined/outliers/
 cd ${wdir}
