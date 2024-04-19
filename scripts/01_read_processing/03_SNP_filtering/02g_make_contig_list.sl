@@ -11,8 +11,8 @@
 #SBATCH --profile task
 
 module purge
-ml R/4.2.1-gimkl-2022a
 
-cd /nesi/nobackup/uoa02613/A_selection_analyses/selection_analyses/WGS/scripts/
+reffai=/nesi/nobackup/uoa02613/A_selection_analyses/selection_analyses/WGS/data/processed/align2ref/ref/AcTris_vAus2.1.fasta.fai
+outcontiglist=/nesi/nobackup/uoa02613/A_selection_analyses/selection_analyses/WGS/data/processed/BCFtools/vcftools_filtered/Superscaffold.list
 
-Rscript --vanilla 02g_make_contig_list.R
+grep "Superscaffold_chr" ${reffai} | cut -f 1 | grep -v "Superscaffold_chrZ" | grep -v "Superscaffold_chrW" > ${outcontiglist}
