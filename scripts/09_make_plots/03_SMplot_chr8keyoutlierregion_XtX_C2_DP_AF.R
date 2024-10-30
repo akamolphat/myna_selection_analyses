@@ -10,7 +10,6 @@ library(cowplot)
 # Define input ------------------------------------------------------------
 XtXfile <- "/nesi/nobackup/uoa02613/A_selection_analyses/selection_analyses/WGS/data/processed/baypass/mac10/combined/myna_baypass_mac10_combined_summary_pi_xtx_SNPs.out"
 C2file <- "/nesi/nobackup/uoa02613/A_selection_analyses/selection_analyses/WGS/data/processed/baypass/mac10/combined/myna_baypass_mac10_combined_IS_C2_GEA_summary_contrast_CON_001_SNPs.out"
-IHSfile <- "/nesi/nobackup/uoa02613/A_selection_analyses/selection_analyses/WGS/data/processed/EHHS/chr8_IHS.txt"
 depthfile <- "/nesi/nobackup/uoa02613/A_selection_analyses/selection_analyses/WGS/data/processed/BCFtools/vcftools_filtered/vcftools_sum_stats/variant.WGS.bial.QUAL30_DP5-35.nosingledoubletons.filtind.5n.contigfilt1.mac10/variant.WGS.bial.QUAL30_DP5-35.nosingledoubletons.filtind.5n.contigfilt1.mac10.ldepth.mean"
 AFfile <- "/nesi/nobackup/uoa02613/A_selection_analyses/selection_analyses/WGS/data/processed/baypass/mac10/combined/MAF_per_pop_chr8.out"
 ## Annotation files -------------------------------------------------------
@@ -30,7 +29,7 @@ x_axis_brks2 <- sort(c(x_axis_brks, 20678727, 20687524))
 
 
 ## Output plots -----------------------------------------------------
-outpng <- paste("/nesi/nobackup/uoa02613/A_selection_analyses/selection_analyses/WGS/results/combined_", chrno, "_", start_pos, "_", end_pos, "_XtX_C2_IHS_DP_AF.png", sep = "")
+outpng <- paste("/nesi/nobackup/uoa02613/A_selection_analyses/selection_analyses/WGS/results/combined_", chrno, "_", start_pos, "_", end_pos, "_XtX_C2_DP_AF.png", sep = "")
 
 # Read in input files ---------------------------------------------------------
 ## Read XtX file --------------------------------------------------------------
@@ -61,17 +60,6 @@ C2thresh <-  as.numeric(capture.output(source(path2script)))
 dt_C2$colour[dt_C2$value > C2thresh] <- "red"
 dt_C2$colour[is.na(dt_C2$colour)] <- "#183059"
 
-## Read IHS file --------------------------------------------------------------
-dt_IHS <- fread(file = IHSfile, header = T) |>
-  filter(CHR == chrval) |>
-  filter(POSITION >= start_pos & POSITION <= end_pos) |>
-  rename(value = LOGPVALUE) |>
-  rename(POS = POSITION) |>
-  rename(chr = CHR)
-
-dt_IHS$colour[dt_IHS$value > 6] <- "red"
-dt_IHS$colour[is.na(dt_IHS$colour)] <- "#183059"
-
 ## Read SNP depth file --------------------------------------------------------
 dt_DP <- fread(depthfile, header = T) |>
   filter(CHROM == chrval) |> 
@@ -83,17 +71,15 @@ dt_DP$colour <- "black"
 
 dt_XtX$data <- "XtX"
 dt_C2$data <- "C2"
-dt_IHS$data <- "IHS"
 dt_DP$data <- "DP"
 
 ## Combine data tables --------------------------------------------------------
 col2keep <- c("chr", "POS", "value", "data", "colour")
 dt_comb <- rbind(dt_XtX[, ..col2keep], 
                  dt_C2[, ..col2keep], 
-                 dt_IHS[, ..col2keep], 
                  dt_DP[, ..col2keep])
 
-dt_comb$data <- factor(dt_comb$data, levels = c("XtX", "C2", "IHS", "DP"))
+dt_comb$data <- factor(dt_comb$data, levels = c("XtX", "C2", "DP"))
 
 ## Create table for adding labels ---------------------------------------------
 # labrat <- 0.04
@@ -114,11 +100,16 @@ dt_genes <- data.table(CHR = dt_genes$V1,
                        ID = gsub(pattern = "ID=", replacement = "", dt_genes$V9))
 dt_genes <- dt_genes |> 
   filter(endPOS > start_pos & endPOS < end_pos)
+dt_ncRNA <- data.table(CHR = "Superscaffold_chr8",
+                       startPOS = 20688459, 
+                       endPOS = 20692993, 
+                       ID = "ncRNA")
+dt_genes <- rbind(dt_genes, dt_ncRNA)
 dt_genes_comb <- rbind(dt_genes |> mutate(data = "XtX"),
-                       dt_genes |> mutate(data = "C2"),
-                       dt_genes |> mutate(data = "IHS"))
-dt_genes_comb$data <- factor(dt_genes_comb$data, levels = c("XtX", "C2", "IHS", "DP"))
+                       dt_genes |> mutate(data = "C2"))
+dt_genes_comb$data <- factor(dt_genes_comb$data, levels = c("XtX", "C2", "DP"))
 dt_genes_comb$dtype <- "Gene"
+dt_genes_comb$dtype[dt_genes_comb$ID == "ncRNA"] <- "ncRNA"
 
 ## Read TEs -------------------------------------------------------------------
 dt_TE <- fread(TEfile, sep = "\t")
@@ -156,10 +147,9 @@ dt_vline <- rbind(dt_TE[,c("POS", "dtype")],
                   dt_SV[,c("POS", "dtype")])
 
 dt_vline_comb <- rbind(dt_vline |> mutate(data = "XtX"),
-      dt_vline |> mutate(data = "C2"),
-      dt_vline |> mutate(data = "IHS"))
+      dt_vline |> mutate(data = "C2"))
 
-dt_vline_comb$data <- factor(dt_vline_comb$data, levels = c("XtX", "C2", "IHS", "DP"))
+dt_vline_comb$data <- factor(dt_vline_comb$data, levels = c("XtX", "C2", "DP"))
 
 ## Read RepeatMasker ----------------------------------------------------------
 dt_RE <- read.fwf(file = Repeatfile, 
@@ -175,7 +165,7 @@ dt_RE <- data.table(CHR = dt_RE$V5,
 dt_RE <- dt_RE |> 
   filter(startpos > start_pos & endpos < end_pos)
 dt_RE$data <- "DP"
-dt_RE$data <- factor(dt_RE$data, levels = c("XtX", "C2", "IHS", "DP"))
+dt_RE$data <- factor(dt_RE$data, levels = c("XtX", "C2", "DP"))
 dt_RE$dtype <- "Repeat (RepeatMasker)"
 
 ## Make plot of XtX, C2, IHS, DP ----------------------------------------------
@@ -206,7 +196,7 @@ p <- p +
                                  ymin= -Inf, ymax= Inf, fill = dtype), alpha = 0.4, col = NA) +
   # geom_text(data = dt_lab, aes(label = label, x = x/1000000, y = y), 
   #           color = "black", fontface = "bold", size = 15/.pt) +
-  scale_fill_manual(breaks = c("Gene", "Repeat (RepeatMasker)"), values = c("#F8766D", "#00BFC4")) +
+  scale_fill_manual(breaks = c("Gene", "Repeat (RepeatMasker)", "ncRNA"), values = c("#F8766D", "#00BFC4", "darkgrey")) +
   theme(legend.box = "horizontal") +
   theme(legend.position = "top",
         legend.direction = "horizontal",
@@ -223,29 +213,6 @@ p <- p +
 p <- p + scale_x_continuous(expand = c(0,0), breaks = x_axis_brks/1000000, position = "top",
                        sec.axis =  dup_axis(name = NULL,
                                             breaks = x_axis_brks2/1000000, labels = NULL))
-
-
-# library(gtable)
-# library(grid)
-# g <- ggplotGrob(p)
-# strips <- g$layout[grep("strip-l", g$layout$name), ]
-# titles <- lapply(paste0("(", letters[seq_len(nrow(strips))], ")"), 
-#                  textGrob, x = 0, hjust = 0, vjust = 1)
-# g <- gtable_add_grob(g, grobs = titles, 
-#                      t = strips$t - 1, b = strips$b - 2, 
-#                      l = strips$l, r = strips$r)
-# grid.newpage()
-# grid.draw(g)
-# p2 <- ggplot() +
-#   geom_rect(dt_genes, mappin = aes(xmin=start_pos, xmax=end_pos,
-#                                  ymin= 10, ymax= 20), col = "blue", fill = NA) +
-#   scale_x_continuous(limits = c(start_pos, end_pos), expand = c(0,0)) + 
-#   scale_y_continuous(expand = c(0,0)) +
-#   theme_classic() +
-#   theme(axis.line = element_blank(),
-#         axis.text = element_blank(),
-#         axis.ticks = element_blank())
-
 
 ## Read in AF file ------------------------------------------------------------
 col_ls <- c("CHR", "SNP", "CLST", "A1", "A2", "MAF", "MAC", "NCHROBS")
@@ -296,7 +263,7 @@ phm <- ggplot(dt_AF, aes(x = Rank, y = order, fill = MAF_STD)) +
     x = NULL,
     y = NULL
   ) +
-  scale_fill_gradient2(name = "Allele Frequency", low = "red", mid = "white", high = "blue", midpoint = 0.5, breaks = c(0, 0.5, 1)) + 
+  scale_fill_gradient2(name = "Allele Frequency", low = "#fc8d59", mid = "#ffffbf", high = "#91bfdb", midpoint = 0.5, breaks = c(0, 0.5, 1)) + 
   scale_y_continuous(breaks = dt_poplab$order, labels = dt_poplab$label, expand = c(0,0)) + 
   # ggtitle("Allele frequency vs population (standardised to Madhya Pradesh)") + 
   theme(legend.position = c(0.99,0.01),
@@ -313,36 +280,14 @@ phm <- ggplot(dt_AF, aes(x = Rank, y = order, fill = MAF_STD)) +
 phm <- phm + geom_vline(xintercept = val,
                  linetype = "dashed", colour = "black", size = 0.5)
 
-# phm 
-# allset2plots <- p + phm + plot_layout(ncol = 1, nrow = 2, heights = c(5, 3))
-
 allset2plots <- cowplot::plot_grid(p + theme(legend.position = "top", legend.justification = "center"), 
                                    phm #+ geom_text(x = diff(range(dt_AF$Rank)) * labrat, y = 11*0.99, label = "E)", fontface = "bold", size = 15/.pt)
                                    , 
                                    align = "v", 
                                    ncol = 1, 
                                    # axis = "lr", 
-                                   rel_heights = c(13, 9))
+                                   rel_heights = c(9, 9))
 
-# ggarrange(p, phm, ncol = 1, align = "v", heights = c(5,4))
-
-png(outpng, width = 8.3, height = 10, units = "in", res = 600)
+png(outpng, width = 8.3, height = 9, units = "in", res = 600)
 allset2plots
 dev.off()
-
-
-# png("/nesi/nobackup/uoa02613/A_selection_analyses/selection_analyses/WGS/results/combined_chr8_XtX_C2_IHS_DP_AFV2.png", width = 8.3, height = 11.7, units = "in", res = 600)
-# cowplot::plot_grid(p + theme(legend.position = "top", legend.justification = "center"), 
-#                    phm + scale_x_continuous(expand = c(0,0), limits = c(1220, 2100))
-#                    , 
-#                    align = "v", 
-#                    ncol = 1, 
-#                    # axis = "lr", 
-#                    rel_heights = c(5, 4), labels = c("A)", "B)"))
-# dev.off()
-
-  
-
-
-
-

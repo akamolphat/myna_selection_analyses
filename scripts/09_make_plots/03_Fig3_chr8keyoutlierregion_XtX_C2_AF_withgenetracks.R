@@ -10,7 +10,6 @@ library(cowplot)
 # Define input ------------------------------------------------------------
 XtXfile <- "/nesi/nobackup/uoa02613/A_selection_analyses/selection_analyses/WGS/data/processed/baypass/mac10/combined/myna_baypass_mac10_combined_summary_pi_xtx_SNPs.out"
 C2file <- "/nesi/nobackup/uoa02613/A_selection_analyses/selection_analyses/WGS/data/processed/baypass/mac10/combined/myna_baypass_mac10_combined_IS_C2_GEA_summary_contrast_CON_001_SNPs.out"
-IHSfile <- "/nesi/nobackup/uoa02613/A_selection_analyses/selection_analyses/WGS/data/processed/EHHS/WGS_IHS.txt"
 depthfile <- "/nesi/nobackup/uoa02613/A_selection_analyses/selection_analyses/WGS/data/processed/BCFtools/vcftools_filtered/vcftools_sum_stats/variant.WGS.bial.QUAL30_DP5-35.nosingledoubletons.filtind.5n.contigfilt1.mac10/variant.WGS.bial.QUAL30_DP5-35.nosingledoubletons.filtind.5n.contigfilt1.mac10.ldepth.mean"
 AFfile <- "/nesi/nobackup/uoa02613/A_selection_analyses/selection_analyses/WGS/data/processed/baypass/mac10/combined/MAF_per_pop_chr8.out"
 ## Annotation files -------------------------------------------------------
@@ -23,11 +22,11 @@ start_pos <- 20580000
 end_pos <- 20750000
 
 x_axis_brks <- seq(20600000, end_pos-50000, by = 50000)
-x_axis_brks2 <- sort(c(x_axis_brks, 20678727, 20687524))
+x_axis_brks2 <- sort(c(20615000, 20666500, 20678727, 20687524))
 
 
 ## Output plots -----------------------------------------------------
-outpng <- paste("/nesi/nobackup/uoa02613/A_selection_analyses/selection_analyses/WGS/results/combined_", chrno, "_", start_pos, "_", end_pos, "_XtX_C2_IHS_AF_withgenetracksv2.png", sep = "")
+outpng <- paste("/nesi/nobackup/uoa02613/A_selection_analyses/selection_analyses/WGS/results/Fig3_combined_", chrno, "_", start_pos, "_", end_pos, "_XtX_C2_AF_withgenetracks.png", sep = "")
 
 # Read in input files ---------------------------------------------------------
 ## Read XtX file --------------------------------------------------------------
@@ -57,19 +56,10 @@ commandArgs <- function(...) c(PODC2, "M_C2", 1, quant_thres)
 C2thresh <-  as.numeric(capture.output(source(path2script)))
 dt_C2$colour[dt_C2$value > C2thresh] <- "red"
 dt_C2$colour[is.na(dt_C2$colour)] <- "#183059"
-## Read IHS file --------------------------------------------------------------
-dt_IHS <- fread(file = IHSfile, header = T) |>
-  filter(CHR == chrval) |>
-  filter(POSITION >= start_pos & POSITION <= end_pos) |>
-  rename(value = LOGPVALUE) |>
-  rename(POS = POSITION) |>
-  rename(chr = CHR)
 
-dt_IHS$colour[dt_IHS$value > 6] <- "red"
-dt_IHS$colour[is.na(dt_IHS$colour)] <- "#183059"
 dt_XtX$data <- "XtX"
 dt_C2$data <- "C2"
-dt_IHS$data <- "iHS"
+
 ## Creat dummy gene track table for plotting ------------------------------
 dt_genetracks <- data.table(chr = chrval,
                             POS = NA,
@@ -88,29 +78,28 @@ dt_genes <- data.table(CHR = dt_genes$V1,
 
 dt_genes <- dt_genes |> 
   filter(endPOS > start_pos & endPOS < end_pos)
-dt_genes$starty <- c(1, 1, 1, 1, 1, 1, 1)
+dt_ncRNA <- data.table(CHR = "Superscaffold_chr8",
+                       startPOS = 20688459, 
+                       endPOS = 20692993, 
+                       ID = "ncRNA")
+dt_genes <- rbind(dt_genes, dt_ncRNA)
+dt_genes <- dt_genes[order(dt_genes$startPOS),]
+dt_genes$starty <- c(1, 1, 1, 1, 1, 1, 1, 1)
 dt_genes$endy <- dt_genes$starty + 1
-dt_genes$label <- 1:7
-dt_genes$fill <- "chartreuse4"
-dt_genes$fill[dt_genes$label == 6] <- "orange"
+dt_genes$label <- 1:8
+dt_genes$fill <- "darkgrey"
+# dt_genes$fill[dt_genes$label == 6] <- "orange"
 dt_genes$ylabpos <- 2
 # rbindlist(list(dt_genes, c("Superscaffold_chr8", 20678727, 20687524, "repeat_482137", 1, 2, "grey", "", 2)))
-# dt_rep <- data.table(CHR = "Superscaffold_chr8", 
-#                      startPOS = 20678727, 
-#                      endPOS = 20687524, 
-#                      ID = "repeat_482137", 
-#                      starty = 1, 
-#                      endy = 2, 
-#                      label = "", 
-#                      fill = "grey", 
-#                      ylabpos = 2)
-# dt_rep_comb <- rbind(dt_rep |> mutate(data = ""))
-# dt_rep_comb$data <- factor(dt_rep_comb$data, levels = c("", "XtX", "C2", "iHS"))
-# 
-# # dt_genes <- rbindlist(list(dt_genes, dt_rep))
-# dt_genes_comb <- rbind(dt_genes |> mutate(data = ""))
-# dt_genes_comb$data <- factor(dt_genes_comb$data, levels = c("", "XtX", "C2", "iHS"))
-
+dt_rep <- data.table(CHR = "Superscaffold_chr8",
+                     startPOS = 20678727,
+                     endPOS = 20687524,
+                     ID = "repeat_482137",
+                     starty = 1,
+                     endy = 2,
+                     label = "",
+                     fill = "lightgrey",
+                     ylabpos = 2)
 
 # Make plots ------------------------------------------------------------------
 theme_plots <- theme_bw() +
@@ -163,18 +152,12 @@ p2 <- plot_val(dt_XtX, ylab = "XtX")
 # p2
 
 ## C2 ---------------------------------------------------------------------
-p3 <- plot_val(dt_C2, ylab = expression(C[2]))
-# p3
-
-
-## iHS --------------------------------------------------------------------
-iHSlab <- expression(paste(-log[10](italic("p")), " iHS", sep = ""))
-p4 <- ggplot(data = dt_IHS) +
-  geom_point(mapping = aes(x = POS/1000000, y = value), colour = dt_IHS$colour, size = 0.5) + 
+p3 <- ggplot(data = dt_C2) +
+  geom_point(mapping = aes(x = POS/1000000, y = value), colour = dt_C2$colour, size = 0.5) + 
   scale_x_continuous(expand = c(0,0), breaks = x_axis_brks/1000000, position = "top", 
                      sec.axis =  dup_axis(name = NULL,
                                           breaks = x_axis_brks2/1000000, labels = NULL)) +
-  ylab(iHSlab) +
+  ylab(expression(C[2])) +
   theme_bw() +
   theme(panel.grid = element_blank(),
         axis.title.x = element_blank(),
@@ -187,11 +170,10 @@ p4 <- ggplot(data = dt_IHS) +
 pcomb <- cowplot::plot_grid(p1,
                    p2,
                    p3, 
-                   p4,
                    align = "v", 
                    ncol = 1, 
                    # axis = "lr", 
-                   rel_heights = c(1.7, 4,4,4), labels = c("A)", "B)", "C)", "D)"))
+                   rel_heights = c(1.7, 4,4,4), labels = c("A)", "B)", "C)"))
 
 ## Read in AF file ------------------------------------------------------------
 col_ls <- c("CHR", "SNP", "CLST", "A1", "A2", "MAF", "MAC", "NCHROBS")
@@ -244,7 +226,7 @@ phm <- ggplot(dt_AF, aes(x = Rank, y = order, fill = MAF_STD)) +
     x = NULL,
     y = NULL
   ) +
-  scale_fill_gradient2(name = "Allele Frequency", low = "red", mid = "white", high = "blue", midpoint = 0.5, breaks = c(0, 0.5, 1)) + 
+  scale_fill_gradient2(name = "Allele Frequency", low = "#fc8d59", mid = "#ffffbf", high = "#91bfdb", midpoint = 0.5, breaks = c(0, 0.5, 1)) + 
   scale_y_continuous(breaks = dt_poplab$order, labels = dt_poplab$label, expand = c(0,0)) + 
   # ggtitle("Allele frequency vs population (standardised to Madhya Pradesh)") + 
   theme(legend.position = c(0.99,0.01),
@@ -253,6 +235,7 @@ phm <- ggplot(dt_AF, aes(x = Rank, y = order, fill = MAF_STD)) +
         legend.direction = "horizontal",
         legend.margin = margin(5, 12, 5, 12),
         legend.title = element_text(face = "bold"),
+        axis.line.y = element_line(color = "black", linewidth = 1),
         axis.text.y = element_text(colour = "black", face = "bold", size = 13),
         axis.text.x = element_blank(),
         plot.margin = unit(c(9, 7, 7, 7), "points")) + 
@@ -268,11 +251,11 @@ allset2plots <- cowplot::plot_grid(pcomb,
                    phm, 
                    # align = "v", 
                    ncol = 1, 
-                   rel_heights = c(13, 9),
-                   labels = c("", "E)"))
+                   rel_heights = c(9, 9),
+                   labels = c("", "D)"))
 
 
-png(outpng, width = 8.3, height = 11, units = "in", res = 600)
+png(outpng, width = 8.3, height = 9, units = "in", res = 600)
 allset2plots
 dev.off()
 
