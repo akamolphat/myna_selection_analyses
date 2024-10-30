@@ -56,8 +56,18 @@ dt_RE <- data.table(startpos=rep(20678727, times = 11),
 haplo_hm <- ggplot() +
   geom_line(data = dt1a, mapping = aes(x = POS/1000000, y = haplo_name, colour = individual), linewidth = 1.5) +
   scale_colour_manual(values = rep(c("lightblue", "khaki1"), times = 40)) +
-  geom_vline(xintercept = 20669616/1000000, lty = "dashed", linewidth = 0.2) +
-  geom_vline(xintercept = 20691861/1000000, lty = "dashed", linewidth = 0.2) +
+  ## Mark key outlier SNP
+  # Peak outlier SNP before and afer SV
+  # XtX
+  # Superscaffold_chr8_20694395_A_G
+  # Superscaffold_chr8_20673781_A_G
+  # C2
+  # Superscaffold_chr8_20694395_A_G # Same as XtX
+  # Superscaffold_chr8_20677064_A_C # Same as missense mutation on copy 2 AMY2A
+  geom_vline(xintercept = 20673781/1000000, lty = "dashed", linewidth = 0.2) +
+  geom_vline(xintercept = 20677064/1000000, lty = "dashed", linewidth = 0.2) +
+  geom_vline(xintercept = 20694395/1000000, lty = "dashed", linewidth = 0.2) +
+  ##
   geom_rect(dt_RE, mapping = aes(xmin=startpos/1000000, xmax=endpos/1000000,
                                  ymin= -Inf, ymax= Inf),
             alpha = 0.2,
@@ -81,86 +91,4 @@ haplo_hm <- ggplot() +
 
 png("results/EHHS/chr8_SV_hap_struc.png", width = 8.3, height = 11.7, units = "in", res = 600)
 haplo_hm
-dev.off()
-
-# Plot iHH over the region
-infile <- "/nesi/nobackup/uoa02613/A_selection_analyses/selection_analyses/WGS/data/processed/EHHS/chr8_SVsnpsremoved_scanhh.txt"
-scan <- fread(infile) %>% filter(CHR == "Superscaffold_chr8" & POSITION >= 20600000 & POSITION <= 20750000)
-infile2 <- "/nesi/nobackup/uoa02613/A_selection_analyses/selection_analyses/WGS/data/processed/EHHS/chr8_scanhh.txt"
-scan2 <- fread(infile2) %>% filter(CHR == "Superscaffold_chr8" & POSITION >= 20600000 & POSITION <= 20750000)
-
-png("results/EHHS/chr8_SV_iHH.png", width = 8.3, height = 8.3, units = "in", res = 600)
-par(mfrow = c(2,1))
-# Plot iHH over the region when SV is not included
-plot(x = scan$POSITION/1000000, y = scan$IHH_A, xlab = "Position (Mb)", ylab = "iHH", col = NA, ylim = c(0, max(c(scan$IHH_A, scan$IHH_D))))
-rect(xleft = 20.678727, xright = 20.687524, ybottom = 0, ytop = max(c(scan$IHH_A, scan$IHH_D)), col = "lightgrey", border = NA)
-points(x = scan$POSITION/1000000, y = scan$IHH_A, col = "red")
-points(x = scan$POSITION/1000000, y = scan$IHH_D, col = "blue", pch = 2)
-abline(v = 20669616/1000000, lty = "dashed")
-abline(v = 20691861/1000000, lty = "dashed")
-title("iHH over chr8 outlier peak (SNPs from SV excluded)")
-legend(x = 20.6, y = 35000, col = c("red", "blue"), pch = c(1,2), legend = c(expression("iHH"[Major]), expression("iHH"[Minor])))
-legend(x = 20.6, y = 48000, lty = c("dashed"), legend = c("iHS outlier peak"))
-# Plot iHH over the region when SNPs in SV were included
-plot(x = scan2$POSITION/1000000, y = scan2$IHH_A, xlab = "Position (Mb)", ylab = "iHH", col = NA, ylim = c(0, max(c(scan2$IHH_A, scan2$IHH_D))))
-rect(xleft = 20.678727, xright = 20.687524, ybottom = 0, ytop = max(c(scan2$IHH_A, scan2$IHH_D)), col = "lightgrey", border = NA)
-points(x = scan2$POSITION/1000000, y = scan2$IHH_A, col = "red")
-points(x = scan2$POSITION/1000000, y = scan2$IHH_D, col = "blue", pch = 2)
-abline(v = 20667691/1000000, lty = "dashed")
-abline(v = 20692138/1000000, lty = "dashed")
-title("iHH over chr8 outlier peak (SNPs from SV included)")
-
-dev.off()
-
-# Plot iHS SV removed -----------------------------------------------------
-dtx <- fread("/nesi/nobackup/uoa02613/A_selection_analyses/selection_analyses/WGS/data/processed/EHHS/WGS_IHS_chr8_SVremoved.txt") %>%
-  filter(CHR == "Superscaffold_chr8" & POSITION >= 20600000 & POSITION <= 20750000)
-
-# Plot iHH over the region ------------------------------------------------
-infile <- "/nesi/nobackup/uoa02613/A_selection_analyses/selection_analyses/WGS/data/processed/EHHS/chr8_SVsnpsremoved_scanhh.txt"
-scan <- fread(infile) %>% filter(CHR == "Superscaffold_chr8" & POSITION >= 20600000 & POSITION <= 20750000)
-png("results/EHHS/chr8_SV_iHS_iHH_snpsremoved.png", width = 8.3, height = 8.3, units = "in", res = 600)
-par(mfrow = c(2,1))
-plot(x = dtx$POSITION/1000000, y = dtx$LOGPVALUE, xlab = "Position (Mb)", ylab = "iHS")
-rect(xleft = 20.678727, xright = 20.687524, ybottom = 0, ytop = max(c(scan$IHH_A, scan$IHH_D)), col = "lightgrey", border = NA)
-abline(v = 20669616/1000000, lty = "dashed")
-abline(v = 20691861/1000000, lty = "dashed")
-title("iHS over chr8 outlier peak (SNPs from SV excluded)")
-
-# Plot iHH over the region when SV is not included
-plot(x = scan$POSITION/1000000, y = scan$IHH_A, xlab = "Position (Mb)", ylab = "iHH", col = NA, ylim = c(0, max(c(scan$IHH_A, scan$IHH_D))))
-rect(xleft = 20.678727, xright = 20.687524, ybottom = 0, ytop = max(c(scan$IHH_A, scan$IHH_D)), col = "lightgrey", border = NA)
-points(x = scan$POSITION/1000000, y = scan$IHH_A, col = "red")
-points(x = scan$POSITION/1000000, y = scan$IHH_D, col = "blue", pch = 2)
-abline(v = 20669616/1000000, lty = "dashed")
-abline(v = 20691861/1000000, lty = "dashed")
-title("iHH over chr8 outlier peak (SNPs from SV excluded)")
-legend(x = 20.6, y = 35000, col = c("red", "blue"), pch = c(1,2), legend = c(expression("iHH"[Major]), expression("iHH"[Minor])))
-legend(x = 20.6, y = 48000, lty = c("dashed"), legend = c("iHS outlier peak"))
-
-dev.off()
-
-# Plot iHS SV removed pos shifted -----------------------------------------
-dtx <- fread("/nesi/nobackup/uoa02613/A_selection_analyses/selection_analyses/WGS/data/processed/EHHS/WGS_IHS_chr8_SVremoved_shifted.txt") %>%
-  filter(CHR == "Superscaffold_chr8" & POSITION >= 20600000 & POSITION <= 20750000)
-
-# Plot iHH over the region ------------------------------------------------
-infile <- "/nesi/nobackup/uoa02613/A_selection_analyses/selection_analyses/WGS/data/processed/EHHS/chr8_SVsnpsremoved_pos_shifted_scanhh.txt"
-scan <- fread(infile) %>% filter(CHR == "Superscaffold_chr8" & POSITION >= 20600000 & POSITION <= 20750000)
-png("results/EHHS/chr8_SV_iHS_iHH_pos_shifted.png", width = 8.3, height = 8.3, units = "in", res = 600)
-par(mfrow = c(2,1))
-plot(x = dtx$POSITION/1000000, y = dtx$LOGPVALUE, xlab = "Position (Mb)", ylab = "iHS")
-abline(v = 20678727/1000000, lty = "dashed")
-title("iHS over chr8 outlier peak (SNPs from SV excluded and position shifted)")
-
-# Plot iHH over the region when SV is not included
-plot(x = scan$POSITION/1000000, y = scan$IHH_A, xlab = "Position (Mb)", ylab = "iHH", col = NA, ylim = c(0, max(c(scan$IHH_A, scan$IHH_D))))
-# rect(xleft = 20.678727, xright = 20.687524, ybottom = 0, ytop = max(c(scan$IHH_A, scan$IHH_D)), col = "lightgrey", border = NA)
-points(x = scan$POSITION/1000000, y = scan$IHH_A, col = "red")
-points(x = scan$POSITION/1000000, y = scan$IHH_D, col = "blue", pch = 2)
-abline(v = 20678727/1000000, lty = "dashed")
-title("iHH over chr8 outlier peak (SNPs from SV excluded and position shifted)")
-legend(x = 20.6, y = 100000, col = c("red", "blue"), pch = c(1,2), legend = c(expression("iHH"[Major]), expression("iHH"[Minor])))
-legend(x = 20.63, y = 100000, lty = c("dashed"), legend = c("SV position"))
-
 dev.off()
