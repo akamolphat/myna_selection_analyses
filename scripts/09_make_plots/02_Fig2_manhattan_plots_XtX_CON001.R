@@ -11,10 +11,9 @@ library(egg)
 # Define input ------------------------------------------------------------
 XtXfile <- "/nesi/nobackup/uoa02613/A_selection_analyses/selection_analyses/WGS/data/processed/baypass/mac10/combined/myna_baypass_mac10_combined_summary_pi_xtx_SNPs.out"
 C2file <- "/nesi/nobackup/uoa02613/A_selection_analyses/selection_analyses/WGS/data/processed/baypass/mac10/combined/myna_baypass_mac10_combined_IS_C2_GEA_summary_contrast_CON_001_SNPs.out"
-IHSfile <- "/nesi/nobackup/uoa02613/A_selection_analyses/selection_analyses/WGS/data/processed/EHHS/WGS_IHS.txt"
 
 ## Output plots -----------------------------------------------------
-outpng <- paste("/nesi/nobackup/uoa02613/A_selection_analyses/selection_analyses/WGS/results/manhattanplot_XtX_C2_IHS.png", sep = "")
+outpng <- paste("/nesi/nobackup/uoa02613/A_selection_analyses/selection_analyses/WGS/results/manhattanplot_XtX_C2.png", sep = "")
 
 chr_order <- c("1", "1A", "2", "3", "4", "4A", "5a", "5b", "5c", "6", "7", "8", "9", 
                "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", 
@@ -82,22 +81,8 @@ commandArgs <- function(...) c(PODC2, "M_C2", 1, quant_thres)
 C2thresh <-  as.numeric(capture.output(source(path2C2script)))
 dt_C2$col[dt_C2$value > C2thresh] <- "red"
 
-## Read IHS file --------------------------------------------------------------
-dt_IHS <- fread(file = IHSfile, header = T) |>
-  rename(value = LOGPVALUE) |>
-  rename(POS = POSITION) |>
-  rename(chr = CHR)
-
-dt_IHS$chr <- gsub(pattern = "^Superscaffold_chr", replacement = "", x = dt_IHS$chr)
-dt_IHS$chr <- factor(x = dt_IHS$chr, levels = chr_order)
-dt_IHS <- cbind(dt_IHS, dt_meta_SNP[,c("bp_cum")]) # Only possible because they are in the same order. If not, see code below
-# dt_IHS <- merge(dt_IHS, dt_meta_SNP[,c("chr", "POS", "bp_cum")], by = c("chr", "POS"))
-dt_IHS <- merge(dt_IHS, axis_set[,c("chr", "col")], by = "chr") 
-dt_IHS$col[dt_IHS$value > 6] <- "red"
-
 dt_XtX$data <- "XtX"
 dt_C2$data <- "C2"
-dt_IHS$data <- "iHS"
 
 
 # Make plots ------------------------------------------------------------------
@@ -147,31 +132,11 @@ p2 <- plot_val(dt_XtX, axis_set, ylab = "XtX")
 # p3 <- plot_val(sample_n(dt_C2, 10000), axis_set, ylab = expression(C[2]))
 p3 <- plot_val(dt_C2, axis_set, ylab = expression(C[2]))
 
-# p3
-
-
-## iHS --------------------------------------------------------------------
-iHSlab <- expression(paste(-log[10](italic("p")), " iHS", sep = ""))
-# p4 <- plot_val(sample_n(dt_IHS, 10000), axis_set, ylab = iHSlab)
-p4 <- plot_val(dt_IHS, axis_set, ylab = iHSlab)
-
-# ggarrange(p2 + theme(axis.title.x = element_blank(),
-#                      axis.ticks.x = element_blank(),
-#                      axis.text.x = element_blank()), 
-#           p3 + theme(axis.title.x = element_blank(),
-#                      axis.ticks.x = element_blank(),
-#                      axis.text.x = element_blank()), 
-#           p4, ncol = 1, labels = c("A)", "B)", "C)"),
-#           label.args = list(gp=grid::gpar(font=2)))
-
 png(outpng, width = 8.3, height = 11.7/2, units = "in", res = 600)
 ggarrange(p2 + theme(axis.title.x = element_blank(),
                      axis.ticks.x = element_blank(),
                      axis.text.x = element_blank()), 
-          p3 + theme(axis.title.x = element_blank(),
-                     axis.ticks.x = element_blank(),
-                     axis.text.x = element_blank()), 
-          p4, ncol = 1, labels = c("A)", "B)", "C)"),
+          p3, ncol = 1, labels = c("A)", "B)"),
           label.args = list(gp=grid::gpar(font=2)))
 dev.off()
 

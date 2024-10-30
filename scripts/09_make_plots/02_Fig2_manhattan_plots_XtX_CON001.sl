@@ -15,4 +15,4 @@ ml R/4.2.1-gimkl-2022a
 
 cd /nesi/nobackup/uoa02613/A_selection_analyses/selection_analyses/WGS/scripts/
 
-Rscript --vanilla 11_manhattan_plots_XtX_CON001_IHS.R
+Rscript --vanilla 02_Fig2_manhattan_plots_XtX_CON001.R
