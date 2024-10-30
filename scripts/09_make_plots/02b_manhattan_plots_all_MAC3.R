@@ -1,26 +1,29 @@
-
-# Define input arguments --------------------------------------------#####
-
-# XtX
-XtX <- "/nesi/nobackup/uoa02613/A_selection_analyses/selection_analyses/WGS/data/processed/baypass/mac3/combined/myna_baypass_mac3_combined_summary_pi_xtx_SNPs.out"
-PODxtx <- "/nesi/nobackup/uoa02613/A_selection_analyses/selection_analyses/WGS/data/processed/baypass/mac3/subset_001/G.btapods_summary_pi_xtx.out"
-path2XtXscript <- "/nesi/nobackup/uoa02613/A_selection_analyses/selection_analyses/shared_scripts/baypass_XtX_threshold.R"
-
-# Library ---------------------------------------------------------------------
-library(tidyverse)
-# library(gridExtra)
+# This script make plots the key outlier region on chromosome8
+# This refers to POS = 20550000 - 20750000
+#
+# Library -----------------------------------------------------------------
 library(data.table)
+library(tidyverse)
+library(cowplot)
+library(egg)
+# library(patchwork)
+# library(ggpubr)
+# Define input ------------------------------------------------------------
+XtXfile <- "/nesi/nobackup/uoa02613/A_selection_analyses/selection_analyses/WGS/data/processed/baypass/mac3/combined/myna_baypass_mac3_combined_summary_pi_xtx_SNPs.out"
+C2file <- "/nesi/nobackup/uoa02613/A_selection_analyses/selection_analyses/WGS/data/processed/baypass/mac3/combined/myna_baypass_mac3_combined_IS_C2_GEA_summary_contrast_CON_001_SNPs.out"
 
-# Define functions --------------------------------------------------------
+## Output plots -----------------------------------------------------
+outpng <- paste("/nesi/nobackup/uoa02613/A_selection_analyses/selection_analyses/WGS/results/FigureS3_1_manhattanplot_mac3_XtX_C2.png", sep = "")
+
 chr_order <- c("1", "1A", "2", "3", "4", "4A", "5a", "5b", "5c", "6", "7", "8", "9", 
                "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", 
                "20", "21", "22", "23", "24", "25", "26", "27", "29", 
                "30", "31", "32")
-
-# XtX data ----------------------------------------------------------------
-## Read XtX tables --------------------------------------------------------
-dt_XtX <- fread(file = XtX, header = T) |> 
+# Read in input files ---------------------------------------------------------
+## Read XtX file --------------------------------------------------------------
+dt_XtX <- fread(file = XtXfile, header = T) |>
   rename(value = M_XtX)
+
 dt_XtX$MRK <- dt_XtX$MRKALL
 dt_XtX$MRKALL <- NULL
 dt_XtX$chr <- gsub(pattern = "^Superscaffold_chr", replacement = "", x = dt_XtX$chr)
@@ -56,84 +59,85 @@ dt_XtX <- merge(dt_XtX, axis_set[,c("chr", "col")], by = "chr")
 
 ## Define outliers --------------------------------------------------------
 quant_thres <- 0.99999
+path2XtXscript <- "/nesi/nobackup/uoa02613/A_selection_analyses/selection_analyses/shared_scripts/baypass_XtX_threshold.R"
+PODxtx <- "/nesi/nobackup/uoa02613/A_selection_analyses/selection_analyses/WGS/data/processed/baypass/mac3/subset_001/G.btapods_summary_pi_xtx.out"
 commandArgs <- function(...) c(PODxtx,quant_thres)
 XtXthresh <-  as.numeric(capture.output(source(path2XtXscript)))
 dt_XtX$col[dt_XtX$value > XtXthresh] <- "red"
-# dt_XtX$col[is.na(dt_XtX$col)] <- "black"
 
-# C2 ----------------------------------------------------------------------
+## Read in C2 file ------------------------------------------------------------
+dt_C2 <- fread(file = C2file, header = T) |>
+  rename(value = M_C2)
+
+dt_C2$chr <- gsub(pattern = "^Superscaffold_chr", replacement = "", x = dt_C2$chr)
+dt_C2$chr <- factor(x = dt_C2$chr, levels = chr_order)
+dt_C2 <- merge(dt_C2, dt_meta_SNP[,c("ID", "bp_cum")], by = "ID")
+dt_C2 <- merge(dt_C2, axis_set[,c("chr", "col")], by = "chr") 
+
 path2C2script <- "/nesi/nobackup/uoa02613/A_selection_analyses/selection_analyses/shared_scripts/baypass_C2_threshold.R"
 PODC2 <- "/nesi/nobackup/uoa02613/A_selection_analyses/selection_analyses/WGS/data/processed/baypass/mac3/subset_001/G.btapods_IS_C2_GEA_summary_contrast.out"
-for (i in 1:7){
-  C2 <- paste("/nesi/nobackup/uoa02613/A_selection_analyses/selection_analyses/WGS/data/processed/baypass/mac3/combined/myna_baypass_mac3_combined_IS_C2_GEA_summary_contrast_CON_00", i, "_SNPs.out", sep = "")
-  dt_C2 <- fread(file = C2, header = T) |> 
-    rename(value = M_C2)
-  dt_C2$chr <- gsub(pattern = "^Superscaffold_chr", replacement = "", x = dt_C2$chr)
-  dt_C2$chr <- factor(x = dt_C2$chr, levels = chr_order)
-  dt_C2 <- merge(dt_C2, dt_meta_SNP[,c("ID", "bp_cum")], by = "ID")
-  dt_C2$data <- paste("CON00", i, sep = "")
-  dt_C2 <- merge(dt_C2, axis_set[,c("chr", "col")], by = "chr") 
-  
-  quant_thres <- 0.99999
-  commandArgs <- function(...) c(PODC2, "M_C2", i, quant_thres)
-  C2thresh <-  as.numeric(capture.output(source(path2C2script)))
-  dt_C2$col[dt_C2$value > C2thresh] <- "red"
-  # dt_C2$col[is.na(dt_C2$col)] <- "black"
-  if (i == 1) {
-    dt_C2_comb <- dt_C2
-  } else {
-    dt_C2_comb <- rbind(dt_C2_comb, dt_C2)
-  }
-}
+quant_thres <- 0.99999
+commandArgs <- function(...) c(PODC2, "M_C2", 1, quant_thres)
+C2thresh <-  as.numeric(capture.output(source(path2C2script)))
+dt_C2$col[dt_C2$value > C2thresh] <- "red"
+
+dt_XtX$data <- "XtX"
+dt_C2$data <- "C2"
 
 
-rm(dt_meta_SNP)
-gc()
-# Combine all plots -------------------------------------------------------
-
-col_common <- intersect(colnames(dt_C2_comb), colnames(dt_XtX))
-dt_merge <- rbindlist(list(dt_XtX[, ..col_common],
-                       dt_C2_comb[, ..col_common]))
-
-dt_merge$data <- factor(dt_merge$data, levels = c("XtX", "CON001", "CON002", "CON003", "CON004", "CON005", "CON006", "CON007"))
-
-theme_manh <- theme_bw() + 
-  theme(
-    legend.position = "bottom",
-    panel.grid.major.x = element_blank(),
-    panel.grid.minor.x = element_blank(),
-    # axis.title.y = element_markdown(),
-    axis.text.x = element_text(angle = 60, size = 8, vjust = 0.5)
-  )
-
-manhplot <- ggplot() +
-  geom_point(dt_merge, mapping = aes(
-    x = bp_cum, y = value), alpha = 0.75,
-    size = 0.25, col = dt_merge$col) +
-  scale_x_continuous(expand = c(0,0),
-    label = axis_set$chr,
-    breaks = axis_set$center
-  ) +
-  scale_y_continuous(expand = c(0, 0)) + #, limits = c(0, ylim)) +
-  # geom_hline(dt.pod.comb.thresh, mapping = aes(yintercept = POD_quantiles, col = lab_comp)) +
-  # scale_color_manual(name = "POD quantiles", values = pod.col) +
-  # geom_point(dt_XtX_outliers, mapping = aes(x = bp_cum, y = M_XtX, fill = label), col = NA, alpha = 0.75, size = 0.25, shape = 21) +
-  # scale_fill_manual(name = "POD threshold", values = quant_col) +
-  labs(
-    x = "Chromosome",
-    y = NULL
-  ) + 
-  # ggtitle("XtX (M_XtX); DArT_ALL vs DArT_WGSsamp vs WGS") + 
-  theme_manh +
-  facet_grid(rows = vars(data), scales = "free_y") +
+# Make plots ------------------------------------------------------------------
+theme_plots <- theme_bw() +
   theme(strip.background = element_blank(),
-        strip.placement = "outside")
+        strip.placement = "outside",
+        strip.text.y = element_text(face = "bold", colour = "black", size = 15),
+        axis.title.x = element_text(face = "bold", colour = "black"),
+        panel.grid = element_blank())
 
-outpng <- "/nesi/nobackup/uoa02613/A_selection_analyses/selection_analyses/WGS/results/manhattanplot_allv1_mac3.png"
-png(outpng, width = 8.3, height = 11.7, units = "in", res = 600)
-manhplot
+theme_empty <- theme_plots + 
+  theme(axis.title.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.text.x = element_blank(),
+        plot.margin = unit(c(0, 0, 0, 0), "cm"))
+
+
+plot_val <- function(dt, axis_set, ylab){
+  p <- ggplot() +
+    geom_point(dt, mapping = aes(
+      x = bp_cum, y = value), alpha = 0.75,
+      size = 0.25, col = dt$col) +
+    scale_x_continuous(expand = c(0,0),
+                       label = axis_set$chr,
+                       breaks = axis_set$center
+    ) +
+    scale_y_continuous(expand = c(0, 0)) + 
+    labs(
+      x = "Chromosome",
+      y = ylab
+    ) + 
+    theme_bw() +
+    theme(panel.grid.major.x = element_blank(),
+          panel.grid.minor.x = element_blank(),
+          axis.text.x = element_text(angle = 60, size = 8, vjust = 0.5),
+          plot.margin = unit(c(0, 5.5, 0, 5.5), "pt"),
+          axis.title.y = element_text(size = 13))
+  return(p)
+}
+## XtX --------------------------------------------------------------------
+# p2 <- plot_val(sample_n(dt_XtX, 10000), axis_set, ylab = "XtX")
+p2 <- plot_val(dt_XtX, axis_set, ylab = "XtX")
+
+# p2
+
+## C2 ---------------------------------------------------------------------
+# p3 <- plot_val(sample_n(dt_C2, 10000), axis_set, ylab = expression(C[2]))
+p3 <- plot_val(dt_C2, axis_set, ylab = expression(C[2]))
+
+png(outpng, width = 8.3, height = 11.7/2, units = "in", res = 600)
+ggarrange(p2 + theme(axis.title.x = element_blank(),
+                     axis.ticks.x = element_blank(),
+                     axis.text.x = element_blank()), 
+          p3, ncol = 1, labels = c("A)", "B)"),
+          label.args = list(gp=grid::gpar(font=2)))
 dev.off()
-
-
 
 
