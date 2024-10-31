@@ -22,8 +22,8 @@ macval=mac10
 wdir=/nesi/nobackup/uoa02613/A_selection_analyses/selection_analyses/WGS/data/processed/baypass/${macval}/combined/outliers/
 cd ${wdir}
 infile=myna_baypass_${macval}_combined_xtx_outliers_0.99999.txt
-bp_dist=100000  
-bp_region_dist=250000 
+bp_dist=50000  
+bp_region_dist=50000 
 outclusterfile=${infile//.txt/_cluster1.txt}
 outsummaryfile=${infile//.txt/_cluster1_summary.txt}
 outbedfile=${infile//.txt/_cluster1_outlier_region.bed}
@@ -51,30 +51,3 @@ do
     bedtools sort -i ${outbedfile} | bedtools merge -i stdin > ${outbedmerged}
     rm ${outbedfile}
 done
-
-echo "Get iHS outlier regions"
-# Add the same thing for the iHS outlier files (note that MAC3 does not have these)
-wdir=/nesi/nobackup/uoa02613/A_selection_analyses/selection_analyses/WGS/data/processed/EHHS/IHS_outliers/
-cd ${wdir}
-infile=WGS_IHS_outliers_logpval_6.txt
-outclusterfile=${infile//.txt/_cluster1.txt}
-outsummaryfile=${infile//.txt/_cluster1_summary.txt}
-outbedfile=${infile//.txt/_cluster1_outlier_region.bed}
-outbedmerged=${outbedfile//.bed/_merged.bed}
-Rscript --vanilla ${path2script} ${infile} ${bp_dist} ${bp_region_dist} ${outclusterfile} ${outsummaryfile} ${outbedfile}
-bedtools sort -i ${outbedfile} | bedtools merge -i stdin > ${outbedmerged}
-rm ${outbedfile}
-
-
-echo "Get iHS outlier regions with SV removed"
-# Add the same thing for the iHS outlier files (note that MAC3 does not have these)
-wdir=/nesi/nobackup/uoa02613/A_selection_analyses/selection_analyses/WGS/data/processed/EHHS/IHS_outliers/
-cd ${wdir}
-infile=WGS_IHS_chr8_SVremoved_outliers_logpval_6.txt
-outclusterfile=${infile//.txt/_cluster1.txt}
-outsummaryfile=${infile//.txt/_cluster1_summary.txt}
-outbedfile=${infile//.txt/_cluster1_outlier_region.bed}
-outbedmerged=${outbedfile//.bed/_merged.bed}
-Rscript --vanilla ${path2script} ${infile} ${bp_dist} ${bp_region_dist} ${outclusterfile} ${outsummaryfile} ${outbedfile}
-bedtools sort -i ${outbedfile} | bedtools merge -i stdin > ${outbedmerged}
-rm ${outbedfile}

@@ -22,8 +22,8 @@ macval=mac3
 wdir=/nesi/nobackup/uoa02613/A_selection_analyses/selection_analyses/WGS/data/processed/baypass/${macval}/combined/outliers/
 cd ${wdir}
 infile=myna_baypass_${macval}_combined_xtx_outliers_0.99999.txt
-bp_dist=100000  
-bp_region_dist=250000 
+bp_dist=50000  
+bp_region_dist=50000 
 outclusterfile=${infile//.txt/_cluster1.txt}
 outsummaryfile=${infile//.txt/_cluster1_summary.txt}
 outbedfile=${infile//.txt/_cluster1_outlier_region.bed}

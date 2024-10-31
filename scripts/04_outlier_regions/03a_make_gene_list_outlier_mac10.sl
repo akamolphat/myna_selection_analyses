@@ -38,12 +38,3 @@ do
     keggpathwaylist=${bedfolder}myna_baypass_${macval}_CON_00${conid}_outliers_0.99999_cluster1_outlier_region_KEGG_Pathway_list.txt
     bedtools intersect -wb -a ${bedin} -b ${gffin} | sort | uniq | grep -oP '(?<=em_KEGG_Pathway=).*?(?=;)' | tr ',' '\n' | sort > ${keggpathwaylist}
 done
-
-echo "Get genes from iHS outlier regions"
-bedfolder=/nesi/nobackup/uoa02613/A_selection_analyses/selection_analyses/WGS/data/processed/EHHS/IHS_outliers/
-bedin=${bedfolder}WGS_IHS_outliers_logpval_6_cluster1_outlier_region_merged.bed
-genelist=${bedfolder}WGS_IHS_outliers_logpval_6_cluster1_outlier_region_region_genes_list.txt
-bedtools intersect -wb -a ${bedin} -b ${gffin} | sort | uniq | grep -oP '(?<=Preferred_name=).*?(?=;)' | sort > ${genelist}
-keggpathwaylist=${bedfolder}myna_baypass_${macval}_xtx_outliers_0.99999_cluster1_outlier_region_KEGG_Pathway_list.txt
-bedtools intersect -wb -a ${bedin} -b ${gffin} | sort | uniq | grep -oP '(?<=em_KEGG_Pathway=).*?(?=;)' | tr ',' '\n' | sort > ${keggpathwaylist}
-

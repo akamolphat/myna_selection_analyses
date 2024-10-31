@@ -2,7 +2,12 @@ library(data.table)
 library(tidyverse)
 dtcomb <- fread(file = "data/processed/baypass/mac10/combined/outliers/myna_baypass_mac10_combined_xtx_outliers_0.99999_cluster1_summary.txt")
 dtcomb$outlier_statistics <- "XtX"
-for (i in 1:7){
+bp_region_dist <- 50000 # Cluster within 50kbp of each other
+# con_id <- 1:7
+con_id <- c(1,4)  # Only CON001 and CON004 were needed and used in this study. 
+# CON001 = Native vs invasive
+# CON004 = Native vs invasive populations founded by one-step introductions (i.e., Melbourne, Fiji, and South Africa) 
+for (i in con_id){
   infile <- paste("data/processed/baypass/mac10/combined/outliers/myna_baypass_mac10_combined_IS_C2_GEA_summary_contrast_CON_00", 
                   i, 
                   "_outliers_0.99999_cluster_summary.txt", sep = "")
@@ -10,14 +15,6 @@ for (i in 1:7){
   dtcon$outlier_statistics <- paste("CON00", i, sep = "")
   dtcomb <- rbind(dtcomb, dtcon)
 }
-
-dtIHS <- fread(file = "data/processed/EHHS/IHS_outliers/WGS_IHS_outliers_logpval_6_cluster1_summary.txt")
-dtIHS$outlier_statistics <- "iHS"
-dtcomb <- rbind(dtcomb, dtIHS)
-
-dtIHS2 <- fread(file = "data/processed/EHHS/IHS_outliers/WGS_IHS_chr8_SVremoved_outliers_logpval_6_cluster1_summary.txt")
-dtIHS2$outlier_statistics <- "iHS_SVremoved"
-dtcomb <- rbind(dtcomb, dtIHS2)
 
 dtcomb5 <- dtcomb %>%
   filter(n > 5)
@@ -68,7 +65,6 @@ dir.create(path = "/nesi/nobackup/uoa02613/A_selection_analyses/selection_analys
 write_csv(x = dtcomb10, file = "results/combined_outliers/outliers_n10_summary.csv")
 write_csv(x = dtcomb5, file = "results/combined_outliers/outliers_n5_summary.csv")
 
-bp_region_dist <- 100000
 dtbed10 <- dtcomb10 |>
   dplyr::mutate(start_pos = start_pos - bp_region_dist,
                 end_pos = end_pos + bp_region_dist) 
