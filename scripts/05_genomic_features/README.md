@@ -10,3 +10,4 @@ This folder contain the scripts that do the following:
 * `06_get_sequence_SV_to_20700000_chr8.sl` - extract nucleotide sequence of the peak outlier region after the SV (after the SV to position 20.7 Mb).
 * `07_extract_maf.sl` - extract allele frequency of each population for all SNPs on chromosome 8. This is only to help with plotting of allele frequency heatmap.
 
+**Note** that the SV, TE, and RepeatMasker file is available on request.
