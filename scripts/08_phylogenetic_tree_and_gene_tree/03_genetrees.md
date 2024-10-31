@@ -21,7 +21,7 @@ amy2acopy2bed="myna_AMY2A_copy2_exon.bed"
 zgrep g_12138 $inputgffgz | grep exon | awk -v OFS='\t' '{print $1, $4-1, $5}' > ${amy2acopy2bed}
 
 cd ../../AMY2A_sequences
-
+```
 ## Extract exon sequences of the two AMY2A copies
 ```
 ml BEDTools/2.30.0-GCC-11.3.0
@@ -53,12 +53,12 @@ cat myna_AMY2A_copy2.fasta >> myna_AMY2A.fasta
 ```
 
 Search of both sequences yield a similar AMY2A-like gene sequence in the common starling. These were the following accession number:
-* XM_014885285.1
-* XM_014885297.1
+* [XM_014885285.1](https://www.ncbi.nlm.nih.gov/nuccore/XM_014885285.1/). The exons are to be downloaded manually from the [graphical viewer of the locus](https://www.ncbi.nlm.nih.gov/gene/106858541) or from the following [link](https://www.ncbi.nlm.nih.gov/projects/sviewer/sequence.cgi?netcache=0&id=XM_014885285.1&format=fasta&filename=XM_014885285.1.exons.fa&ranges=0-185,186-332,333-530,531-761,762-895,896-1018,1019-1118,1119-1240,1241-1366,1367-1680)
+* [XM_014885297.1](https://www.ncbi.nlm.nih.gov/nuccore/XM_014885297.1/). The exons are to be downloaded manually from the [graphical viewer of the locus](https://www.ncbi.nlm.nih.gov/gene?cmd=retrieve&list_uids=106858550) or from the following [link](https://www.ncbi.nlm.nih.gov/projects/sviewer/sequence.cgi?netcache=0&id=XM_014885297.1&format=fasta&filename=XM_014885297.1.exons.fa&ranges=0-212,213-359,360-557,558-788,789-922,923-1045,1046-1145,1146-1267,1268-1393,1394-2090)
 
-These genes are found in an un-named contig in the North American common starling genome.
+These genes are found in an un-named contig in the [North American common starling genome genbank accession GCF_001447265.1](https://www.ncbi.nlm.nih.gov/datasets/genome/GCF_001447265.1/).
 
-The exon sequences of XM_014885285.1 and XM_014885297.1 were downloaded, and the exon sequences were blasted agains the Australian common starling genome as follows:
+The exon sequences of XM_014885285.1 and XM_014885297.1 were downloaded, and the exon sequences were blasted agains the [Australian common starling genome genbank accession GCA_023376015.1](https://www.ncbi.nlm.nih.gov/datasets/genome/GCA_023376015.1/) as follows:
 ```
 queryfile=XM_014885285.1.exons.fa
 subjectfile=/nesi/nobackup/uoa02613/kstuart_projects/At4_MynaStarling/data/resources/genomes/Svulgaris_vAU_1.0.fasta
@@ -68,8 +68,7 @@ queryfile=XM_014885297.1.exons.fa
 subjectfile=/nesi/nobackup/uoa02613/kstuart_projects/At4_MynaStarling/data/resources/genomes/Svulgaris_vAU_1.0.fasta
 blastn -query ${queryfile} -subject ${subjectfile} -outfmt 7 > XM_014885297_exon_blast_SvAU.txt
 ```
-
-The same was done against the superb starling genome:
+The same was done against the [superb starling genome genbank accession GCA_015883425.2](https://www.ncbi.nlm.nih.gov/datasets/genome/GCA_015883425.2/):
 ```
 # Align starling exons to superb starling
 queryfile=XM_014885297.1.exons.fa
@@ -80,7 +79,7 @@ queryfile=XM_014885285.1.exons.fa
 subjectfile=/nesi/nobackup/uoa02613/A_selection_analyses/selection_analyses/WGS/data/raw_data/Superb_starling/ncbi_dataset/data/GCA_015883425.2/GCA_015883425.2_CU_Lasu_v2_genomic.fna
 blastn -query ${queryfile} -subject ${subjectfile} -outfmt 7 > XM_014885285_exon_blast_Lsuperbus.txt
 ```
-## Extract exon positions of the two AMY2A copies from the Australian reference genome and create bed file
+## Extract exon positions of the two AMY2A copies from the Australian common starling reference genome and create bed file
 
 ```
 # Copy 1
@@ -178,3 +177,4 @@ iqtree -s Aligned_AMY2A_sequences.trimal_gt0.fasta
 iqtree -s Aligned_AMY2A_sequences.trimal_gt0_5.fasta
 iqtree -s Aligned_AMY2A_sequences.trimal_gt1_trimstart.fasta
 ```
+Resulting `.treefile` were visualised in [itol](https://itol.embl.de/upload.cgi)
