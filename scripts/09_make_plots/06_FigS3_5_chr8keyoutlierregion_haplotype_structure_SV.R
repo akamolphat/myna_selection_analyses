@@ -53,9 +53,17 @@ dt1a$pop <- factor(x = dt1a$pop,
 dt_RE <- data.table(startpos=rep(20678727, times = 11),
                     endpos=rep(20687524, times = 11),
                     unique(dt1a$pop))
+
+brks <- unique(dt1a$haplo_name)
+labs <- brks
+labs[grep("_2", labs)] <- ""
+labs <- gsub("_1", "", labs)
+
 haplo_hm <- ggplot() +
   geom_line(data = dt1a, mapping = aes(x = POS/1000000, y = haplo_name, colour = individual), linewidth = 1.5) +
   scale_colour_manual(values = rep(c("lightblue", "khaki1"), times = 40)) +
+  scale_y_discrete(breaks = brks,
+                   labels = labs) +
   ## Mark key outlier SNP
   # Peak outlier SNP before and afer SV
   # XtX
@@ -83,12 +91,14 @@ haplo_hm <- ggplot() +
   xlab("Position (Mb)") +
   ylab("Individual haplotype") + 
   theme_bw() +
-  theme(axis.text.y = element_text(size = 5),
+  theme(axis.text.y = element_text(size = 5, vjust = -0.2),
+        # axis.ticks.y = element_blank(),
         legend.position = "none",
         strip.placement = "outside",
-        strip.text.y = element_text(size = 7)) 
+        strip.text.y = element_text(size = 5, face = "bold"),
+        panel.spacing = unit(0.15, "lines"))
 
 
-png("results/EHHS/chr8_SV_hap_struc.png", width = 8.3, height = 11.7, units = "in", res = 600)
+png("results/EHHS/chr8_SV_hap_struc.png", width = 6.5, height = 8.3, units = "in", res = 600)
 haplo_hm
 dev.off()
