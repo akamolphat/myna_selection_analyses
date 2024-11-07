@@ -22,7 +22,7 @@ start_pos <- 20580000
 end_pos <- 20750000
 
 x_axis_brks <- seq(20600000, end_pos-50000, by = 50000)
-x_axis_brks2 <- sort(c(20615000, 20666500, 20678727, 20687524))
+x_axis_brks2 <- sort(c(20615000, 20666500, 20678727, 20687524, 20700000))
 
 
 ## Output plots -----------------------------------------------------
@@ -199,7 +199,7 @@ dt_AF <- dt_AF %>%
                              TRUE ~ MAF))
 
 dt_AF$SNPPOS <- as.character(dt_AF$POS)
-poplab <- c("Madhya\n Pradesh", "Tamil Nadu", "Maharashtra", "Maharashtra\nsubpop. A", "Fiji", "Melbourne", "Cairns", "Napier", "Leigh", "Great\nBarrier Isl.", "South\nAfrica")
+poplab <- c("Madhya Pradesh", "Tamil Nadu", "Maharashtra", "Maharashtra\nsubpop. A", "Fiji", "Melbourne", "Cairns", "Napier", "Leigh", "Great Barrier\nIsland", "South Africa")
 brk <- c("Madhya_Pradesh", "Tamil_Nadu", "Maharashtra", "Maharashtra_subpopulation_A", "Fiji", "Melbourne", "Cairns", "Napier", "Leigh", "Great_Barrier_Island", "South_Africa")
 dt_POS <- data.table(POS = sort(unique(dt_AF$POS)))
 dt_POS$Rank <- rank(dt_POS$POS, ties.method = "min")
@@ -221,13 +221,13 @@ phm <- ggplot(dt_AF, aes(x = Rank, y = order, fill = MAF_STD)) +
   geom_tile() +
   scale_x_discrete(expand = c(0,0)) +
   # geom_text(y = "South Africa", x = labx, label = "D") +
-  # scale_y_discrete() +
+  # scale_y_discrete(position = "right") +
   labs(
     x = NULL,
     y = NULL
   ) +
   scale_fill_gradient2(name = "Allele Frequency", low = "#fc8d59", mid = "#ffffbf", high = "#91bfdb", midpoint = 0.5, breaks = c(0, 0.5, 1)) + 
-  scale_y_continuous(breaks = dt_poplab$order, labels = dt_poplab$label, expand = c(0,0)) + 
+  scale_y_continuous(breaks = dt_poplab$order, labels = dt_poplab$label, expand = c(0,0), position = "right") + 
   # ggtitle("Allele frequency vs population (standardised to Madhya Pradesh)") + 
   theme(legend.position = c(0.99,0.01),
         legend.justification = c(1,0),
@@ -249,11 +249,20 @@ phm <- phm + geom_vline(xintercept = val,
 # Combine plots
 allset2plots <- cowplot::plot_grid(pcomb,
                    phm, 
-                   # align = "v", 
+                   align = "v",
                    ncol = 1, 
                    rel_heights = c(9, 9),
                    labels = c("", "D)"))
 
+
+allset2plots <- cowplot::plot_grid(p1,
+                            p2,
+                            p3, 
+                            phm,
+                            align = "v", 
+                            ncol = 1, 
+                            # axis = "lr", 
+                            rel_heights = c(1.7, 4,4,9.7), labels = c("A)", "B)", "C)", "D)"))
 
 png(outpng, width = 8.3, height = 9, units = "in", res = 600)
 allset2plots
