@@ -27,6 +27,7 @@ x_axis_brks2 <- sort(c(20615000, 20666500, 20678727, 20687524, 20700000))
 
 ## Output plots -----------------------------------------------------
 outpng <- paste("/nesi/nobackup/uoa02613/A_selection_analyses/selection_analyses/WGS/results/Fig3_combined_", chrno, "_", start_pos, "_", end_pos, "_XtX_C2_AF_withgenetracks.png", sep = "")
+outpdf <- paste("/nesi/nobackup/uoa02613/A_selection_analyses/selection_analyses/WGS/results/Fig3_combined_", chrno, "_", start_pos, "_", end_pos, "_XtX_C2_AF_withgenetracks.pdf", sep = "")
 
 # Read in input files ---------------------------------------------------------
 ## Read XtX file --------------------------------------------------------------
@@ -247,12 +248,12 @@ phm <- phm + geom_vline(xintercept = val,
 
 
 # Combine plots
-allset2plots <- cowplot::plot_grid(pcomb,
-                   phm, 
-                   align = "v",
-                   ncol = 1, 
-                   rel_heights = c(9, 9),
-                   labels = c("", "D)"))
+# allset2plots <- cowplot::plot_grid(pcomb,
+#                    phm, 
+#                    align = "v",
+#                    ncol = 1, 
+#                    rel_heights = c(9, 9),
+#                    labels = c("", "D)"))
 
 
 allset2plots <- cowplot::plot_grid(p1,
@@ -268,4 +269,7 @@ png(outpng, width = 8.3, height = 9, units = "in", res = 600)
 allset2plots
 dev.off()
 
+pdf(outpdf, width = 8.3, height = 9)
+allset2plots
+dev.off()
 

@@ -124,11 +124,6 @@ ls_mrk_id2 <- c("Superscaffold_chr8_20677064_A_C", "Superscaffold_chr8_20694395_
 # 2 panel plot of the following markers:
 ls_mrk_id3 <- c("Superscaffold_chr8_20694395_A_G", "Superscaffold_chr8_19599941_G_A")
 
-# 5 panel plot of the following markers
-ls_mrk_id3 <- c("Superscaffold_chr8_20677064_A_C", "Superscaffold_chr8_20694395_A_G", "Superscaffold_chr8_20673781_A_G",  # Selected SNPs
-                "Superscaffold_chr8_19599941_G_A", "Superscaffold_chr8_21800137_T_C") #) # Random SNPs
-
-
 CLSTorder <- c("Madhya Pradesh", "Tamil Nadu", "Maharashtra", "Maharashtra subpop. A", "Fiji", "Melbourne", "Cairns", "Napier", "Leigh", "Great Barrier Island", "South Africa")
 
 ## Original dataset --------------------------------------------------------
@@ -193,9 +188,12 @@ p0b
 dev.off()
 
 ### Plot 4 panel plot ----
-dt_comb_4panel <- dt_comb
-filter(MRK_ID %in% ls_mrk_id2)
-p1a <- plot_panel(dt_comb_4panel, dt_fake, override.linetype)
+dt_comb_4panel <- dt_comb %>% 
+  filter(MRK_ID %in% ls_mrk_id2)
+dt_comb_4panel$POS_ID <- factor(dt_comb_4panel$POS_ID, levels = unique(dt_comb_4panel$POS_ID))
+dt_fake_4panel <- dt_fake2 %>%
+  filter(POS_ID %in% unique(dt_comb_4panel$POS_ID))
+p1a <- plot_panel(dt_comb_4panel, dt_fake_4panel, override.linetype)
 png("/nesi/nobackup/uoa02613/A_selection_analyses/selection_analyses/WGS/results/EHHS/EHHS_chr8_selected_vs_random_4panel_withSV_revision1.png", 
     width = 8.3, height = 8.3, units = "in", res = 300)
 p1a
@@ -206,7 +204,7 @@ dt_comb_50kb_4panel <- dt_comb_50kb %>%
 dt_fake2_sub_4panel <- dt_fake2 %>%
   filter(POS_ID %in% unique(dt_comb_50kb_4panel$POS_ID))
 
-p1b <- plot_panel(dt_comb_50kb, dt_fake2_sub_4panel, override.linetype)
+p1b <- plot_panel(dt_comb_50kb_4panel, dt_fake2_sub_4panel, override.linetype)
 png("/nesi/nobackup/uoa02613/A_selection_analyses/selection_analyses/WGS/results/EHHS/EHHS_chr8_selected_vs_random_4panel_zoomed_withSV_revision1.png", 
     width = 8.3, height = 8.3, units = "in", res = 300)
 p1b
@@ -214,7 +212,7 @@ dev.off()
 ### 2 panel plot -----
 dt_comb_sub <- dt_comb %>% 
   filter(MRK_ID %in% ls_mrk_id3)
-dt_fake_sub <- dt_fake %>%
+dt_fake_sub <- dt_fake2 %>%
   filter(POS_ID %in% unique(dt_comb_sub$POS_ID))
 
 p2a <- plot_panel(dt_comb_sub, dt_fake_sub, override.linetype)
@@ -232,5 +230,10 @@ dt_fake2_sub <- dt_fake2 %>%
 p2b <- plot_panel(dt_comb_50kb_sub, dt_fake2_sub, override.linetype)
 png("/nesi/nobackup/uoa02613/A_selection_analyses/selection_analyses/WGS/results/EHHS/EHHS_chr8_selected_vs_random_2panel_zoomed_withSV_revision1.png", 
     width = 8.3, height = 5, units = "in", res = 300)
+p2b
+dev.off()
+
+pdf("/nesi/nobackup/uoa02613/A_selection_analyses/selection_analyses/WGS/results/EHHS/EHHS_chr8_selected_vs_random_2panel_zoomed_withSV_revision1.pdf", 
+    width = 8.3, height = 5)
 p2b
 dev.off()
