@@ -8,25 +8,48 @@ Folders are named sequentially with a two digit prefix and the scripts in each f
 
 ```
 ├── 01_read_processing
-│   ├── 01_xxx.sl
-│   └── 02_xxx.sl
+│   ├── 01_trim_reads
+│   ├── 02_align_reads_variant_calling
+│   └── 02_SNP_filtering
 |
 ├── 02_baypass_WGS
 │   ├── 01_xxx.sl
-│   └── 02_xxx.sl
+│   ├── ......
+│   └── README.md
 |
-├── 03_EHHS
+├── 03_EHHS_WGS
 │   ├── 01_xxx.sl
-│   └── 02_xxx.sl
+│   └── README.md
 |
-├── 04_samplot
+├── 04_outlier_regions
+│   ├── 01_xxx.sl
+│   ├── ......
+│   └── README.md
+|
+├── 05_genomic_features
+│   ├── 01_xxx.sl
+│   ├── ......
+│   └── README.md
+|
+├── 06_samplot
 │   ├── 00_10X_to_ref
+│   ├── 01_xxx.sl
+│   ├── ......
 │   └── README.md
 |
-├── 05_baypass_SV
+├── 07_baypass_SV
+│   ├── 01_xxx.sl
+│   ├── ......
 │   └── README.md
 |
-├── 06_genomic_features
+├── 08_phylogenetic_tree_and_gene_tree
+│   ├── 01_xxx.sl
+│   ├── ......
+│   └── 03_genetrees.md
+|
+├── 09_make_pots
+│   ├── 01_xxx.sl
+│   ├── ......
 │   └── README.md
 |
 ├── 01_xxx.sl
@@ -36,8 +59,11 @@ Folders are named sequentially with a two digit prefix and the scripts in each f
 
 * `01_read_processing` - Processes the WGS reads, align them to the reference genome, mark duplicate reads, and call SNPs. 
 * `02_baypass_WGS` - Converts SNP data into BayPass format, and performs BayPass core model with the `--contrastfile` argument
-* `03_EHHS` - Performs IHS, and EHHS.
-* `04_samplot` - Create samplot to identify and investigate SV region in all samples, including reference individual.
-* `05_baypass_SV` - Converts manually genotyped SV to BayPass format and performs BayPass on it.
-* `06_genomic_features` - Perform VEP, extract SV, TE, RepeatMasker, and sequences of interest for BLASTing on NCBI.
+* `03_EHHS` - Performs EHHS.
+* `04_outlier_regions` - Define outlier regions.
+* `05_genomic_features` - Perform VEP, extract SV, TE, RepeatMasker, and sequences of interest for BLASTing on NCBI.
+* `06_samplot` - Create samplot to identify and investigate SV region in all samples, including reference individual.
+* `07_baypass_SV` - Converts manually genotyped SV to BayPass format and performs BayPass on it.
+* `08_phylogenetic_tree_and_gene_tree` - Creates phylogenetic tree based on thinned WGS data and SNPs from key outlier region, and create gene trees based on different copies of AMY2A in multiple reference genomes.
+* `09_make_plots` - Make figures used in the manuscript and supplementary materials
 
