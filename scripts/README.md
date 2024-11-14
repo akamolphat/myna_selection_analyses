@@ -52,7 +52,8 @@ Folders are named sequentially with a two digit prefix and the scripts in each f
 │   ├── ......
 │   └── README.md
 |
-├── 01_xxx.sl
+├── 01_data_exploration_site_indiv_stats.R
+├── plot_DP_hist.R
 └── README.md
 ```
 ## General overview
@@ -67,3 +68,6 @@ Folders are named sequentially with a two digit prefix and the scripts in each f
 * `08_phylogenetic_tree_and_gene_tree` - Creates phylogenetic tree based on thinned WGS data and SNPs from key outlier region, and create gene trees based on different copies of AMY2A in multiple reference genomes.
 * `09_make_plots` - Make figures used in the manuscript and supplementary materials
 
+## Shared scripts
+* `01_data_exploration_site_indiv_stats.R` - Plot histograms and density plots to visualise the datasets after each stage of filtering.
+* `plot_DP_hist.R` - Plot histogram of read depths. Used to help guide DP thresholds for filtering.
