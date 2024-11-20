@@ -54,6 +54,8 @@ Folders are named sequentially with a two digit prefix and the scripts in each f
 |
 ├── 01_data_exploration_site_indiv_stats.R
 ├── plot_DP_hist.R
+├── baypass_C2_threshold.R
+├── baypass_XtX_threshold.R
 └── README.md
 ```
 ## General overview
@@ -71,3 +73,5 @@ Folders are named sequentially with a two digit prefix and the scripts in each f
 ## Shared scripts
 * `01_data_exploration_site_indiv_stats.R` - Plot histograms and density plots to visualise the datasets after each stage of filtering.
 * `plot_DP_hist.R` - Plot histogram of read depths. Used to help guide DP thresholds for filtering.
+* `baypass_C2_threshold.R` - script returns the value for the M_C2 threshold based on the percentile based on pseudo observed data. The value used to determine outliers in the paper is 99.999% or 0.99999.
+* `baypass_XtX_threshold.R` - script returns the value for the M_XtX threshold based on the percentile based on pseudo observed data. The value used to determine outliers in the paper is 99.999% or 0.99999.
